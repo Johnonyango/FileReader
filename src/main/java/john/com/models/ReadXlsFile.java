@@ -7,8 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import john.com.utilitiesDb.DbConnection;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
@@ -49,8 +47,20 @@ public class ReadXlsFile {
             System.out.println();
         }
     }
-    public void dbData(){
-        PreparedStatement st = (PreparedStatement) dbConnection;
+    public boolean dbData(String name, String town, int age ){
+        try {
+            PreparedStatement st = dbConnection.getConnection().prepareStatement("INSERT INTO teams(Name, Age, Town) VALUES(?, ?, ?)");
+            st.setString(1, name);
+            st.setInt(1, age);
+            st.setString(1, town);
+            return dbConnection.execute(st);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
 
     }
 }
