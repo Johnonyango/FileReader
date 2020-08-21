@@ -19,40 +19,37 @@ public class ReadXlsFile {
         FileInputStream fis=new FileInputStream(new File("/home/john/FileManager/Employee.xlsx"));
         XSSFWorkbook wb=new XSSFWorkbook(fis);
         XSSFSheet sheet=wb.getSheetAt(0);
-        FormulaEvaluator formulaEvaluator=wb.getCreationHelper().createFormulaEvaluator();
 
         try {
             dbConnection = new DbConnection();
+            int a = 0;
+            for(Row row: sheet) {
+                if (a==0) {
+                    a++;
+                    continue;
+                }
+                dbData(row.getCell(0).getStringCellValue(), (int)row.getCell(1).getNumericCellValue(), row.getCell(2).getStringCellValue());
+            }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        for(Row row: sheet)
-        {
 
-            for(Cell cell: row)
-            {
-                switch(formulaEvaluator.evaluateInCell(cell).getCellType())
-                {
-
-                    case Cell.CELL_TYPE_NUMERIC:
-                        System.out.print(cell.getNumericCellValue()+ "\t\t");
-                        break;
-                    case Cell.CELL_TYPE_STRING:
-                        System.out.print(cell.getStringCellValue()+ "\t\t");
-                        break;
+    }
+    public boolean dbData(String name , int age,String town ){
+        try {
+            if (dbConnection==null){
+                try {
+                    dbConnection = new DbConnection();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
             }
-            System.out.println();
-        }
-    }
-    public boolean dbData(String name, String town, int age ){
-        try {
-            PreparedStatement st = dbConnection.getConnection().prepareStatement("INSERT INTO teams(Name, Age, Town) VALUES(?, ?, ?)");
+            PreparedStatement st = dbConnection.getConnection().prepareStatement("INSERT INTO Employee(Name, Age, Town) VALUES(?, ?, ?)");
             st.setString(1, name);
-            st.setInt(1, age);
-            st.setString(1, town);
+            st.setInt(2, age);
+            st.setString(3, town);
             return dbConnection.execute(st);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -60,7 +57,14 @@ public class ReadXlsFile {
         return false;
     }
 
+//    Test main method
     public static void main(String[] args) {
-
+        ReadXlsFile resd = new ReadXlsFile();
+//        resd.dbData("John" , 21, "Nairobi");
+        try {
+            resd.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
